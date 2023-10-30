@@ -1,0 +1,95 @@
+name: Build & Release Client 
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+            ~/web/node_modules
+          key: ${{ runner.os }}-pio
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+      - name: Install Web Dependencies
+        run: cd web && npm ci
+
+      - name: Application Version
+        id: version
+        uses: paulhatch/semantic-version@v5.3.0
+        with:
+          minor_pattern: '/Merge pull request #[0-9]* from AIRnemos\/development/'
+          major_pattern: '/Merge pull request #[0-9]* from AIRnemos\/next/'
+
+      - name: Build PlatformIO Project
+        run: pio run
+        env:
+          VERSION: ${{ steps.version.outputs.version }}${{ github.ref_name != 'main' && format('-development-{0}', github.sha) || ''}}
+
+      - name: Save Firmware
+        uses: actions/upload-artifact@v3
+        with:
+          name: firmware
+          path: .pio/build/AIRnemos/firmware.bin
+              
+  release:
+    runs-on: ubuntu-latest
+
+    needs: [build]
+
+    if: github.ref_name == 'main'
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Download firmware
+        uses: actions/download-artifact@v3
+        with:
+          name: firmware
+
+      - name: Application Version
+        id: version
+        uses: paulhatch/semantic-version@v5.3.0
+        with:
+          minor_pattern: '/Merge pull request #[0-9]* from AIRnemos\/development/'
+          major_pattern: '/Merge pull request #[0-9]* from AIRnemos\/next/'
+
+      - name: Create tag
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/v${{ steps.version.outputs.version }}',
+              sha: context.sha
+            })
+
+      - uses: ncipollo/release-action@v1
+        with:
+          name: Version ${{ steps.version.outputs.version }}
+          draft: true
+          artifacts: "firmware.bin"
+          tag: v${{ steps.version.outputs.version }}
+
+

@@ -1,0 +1,33 @@
+<script>
+    import Field from "../components/Field.svelte";
+import { canNext } from "./store";
+    import { onMount } from "svelte";
+
+    export function next(index) {
+        return index + 4
+    }
+
+    export function previos(index) {
+        if(data.wifi.ap.name == `AIRnemos - ${data.name}`) data.wifi.ap.name = ""
+        return index - 1
+    }
+
+    onMount(() => {
+        if(data.wifi.ap.name == "") data.wifi.ap.name = `AIRnemos - ${data.name}`
+        validate()
+    })
+
+    function validate() {
+        canNext.set((() => {
+            if(data.wifi.ap.name == undefined || data.wifi.ap.name.length == 0) return false
+            if(data.wifi.ap.password == undefined || data.wifi.ap.password.length <= 8) return false
+
+            return true
+        })())
+    }
+
+    export let data;
+</script>
+
+<Field label="setup_input_label_wifi_ap_name" name="ap-name" type="text" bind:value={data.wifi.ap.name} on:change={validate} />
+<Field label="setup_input_label_wifi_ap_password" name="ap-password" type="password" bind:value={data.wifi.ap.password} on:change={validate}/>

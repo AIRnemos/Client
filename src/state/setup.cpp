@@ -1,0 +1,97 @@
+#include "state/setup.h"
+
+namespace StateSetup {
+    
+    AsyncWebHandler wifi_scan_hander;
+    AsyncWebHandler wifi_check_handler;
+    AsyncWebHandler handler;
+    bool init = false;
+
+    TaskHandle_t task_led;
+
+    void ledTask(void * parameter) {
+        uint8_t brighness;
+        uint8_t hue;
+
+        for (;;)
+        {
+            brighness = beatsin8(10, 50, 255);
+            hue = beatsin8(5, 140, 170);
+            FastLED.showColor(CHSV(hue, 255, brighness));
+            vTaskDelay(20 / portTICK_PERIOD_MS);
+        }
+    }
+
+    void start() {
+        xTaskCreate(ledTask, "LED-Setup", 2048, NULL, 5, &task_led);
+
+        Wifi::startAP();
+        Wifi::startScaning();
+
+        wifi_scan_hander = Web::server.on("/api/wifi/scan", HTTP_GET, [] (AsyncWebServerRequest *request) {
+            DynamicJsonDocument result(1024);
+            JsonArray array = result.to<JsonArray>();
+
+            Wifi::getWifis(&array);
+
+            AsyncResponseStream *response = request->beginResponseStream("application/json");
+            serializeJson(result, *response);
+            request->send(response);
+        });
+
+        wifi_check_handler = Web::server.on("/api/wifi/check", HTTP_POST, [] (AsyncWebServerRequest *request) {
+            DynamicJsonDocument bodyJSON(1024);
+            deserializeJson(bodyJSON, request->_tempObject);
+
+            DynamicJsonDocument result(1024);
+            
+            Wifi::WifiCheck checkData = Wifi::check(bodyJSON["ssid"].as<String>().c_str(), bodyJSON.containsKey("password") ? bodyJSON["password"].as<String>().c_str() : nullptr);
+
+            result["success"] = checkData.succeed;
+            result["ip"] = checkData.ip;
+
+            AsyncResponseStream *response = request->beginResponseStream("application/json");
+            serializeJson(result, *response);
+            request->send(response);
+        }, nullptr, [] (AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+            if (total > 0 && request->_tempObject == NULL) {
+                request->_tempObject = malloc(total);
+            }
+            if (request->_tempObject != NULL) {
+                memcpy((uint8_t*)(request->_tempObject) + index, data, len);
+            }
+        });
+
+        handler = Web::server.on("/api/setup", HTTP_POST, [] (AsyncWebServerRequest *request) {}, nullptr, [] (AsyncWebServerRequest* req, uint8_t* data, size_t len, size_t index, size_t total) {
+            if(init) return;
+
+            DynamicJsonDocument bodyJSON(384);
+            deserializeJson(bodyJSON, data, len);
+
+            if(!Config::setupConfig(bodyJSON)) {
+                log_i("failed");
+                bodyJSON.clear();
+                req->send_P(401, "application/json; charset=UTF-8", R"==({"success": false})==");
+                return;
+            }
+
+            bodyJSON.clear();
+            req->send_P(200, "application/json; charset=UTF-8", R"==({"success": true})==");
+
+            init = true;
+
+            Web::server.removeHandler(&wifi_scan_hander);
+            Web::server.removeHandler(&wifi_check_handler);
+            Web::server.removeHandler(&handler);
+
+            Wifi::stopScaning();
+            Wifi::stopAP();
+            Web::stop();
+
+            vTaskDelete(task_led);
+            StateNormal::start();
+        });
+
+        Web::start();
+    }
+}

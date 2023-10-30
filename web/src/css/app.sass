@@ -1,0 +1,104 @@
+@import "./_breakpoints"
+@import "./_color"
+@import "./button"
+
+html,
+body
+  height: 100vh
+  width: 100vw
+  
+  padding: 0
+  margin: 0
+  background: $secondary
+  font-family: Lato, sans-serif
+  height: -webkit-fill-available
+
+#app
+  overflow-x: hidden
+
+  nav
+    position: fixed
+    bottom: 0
+    left: 0
+    right: 0
+
+    padding: 1rem
+    margin: 1rem
+    border-radius: 1rem
+    background: $white
+
+    .top, .bottom
+      display: none
+
+    .links
+      display: flex
+      justify-content: space-evenly
+
+    .bottom
+      margin-top: auto
+
+  main
+    padding: 0.5rem
+
+@include lg
+  #app
+    display: flex
+
+    height: 100vh
+    width: 100vw
+    
+    padding: 0
+    margin: 0
+    
+    nav
+      top: 0
+      bottom: 0
+      left: 0
+      right: unset
+      width: 14rem !important
+      padding: 2rem
+
+      overflow-y: scroll
+      overflow-x: hidden
+      -ms-overflow-style: none
+      scrollbar-width: none
+      &::-webkit-scrollbar 
+        display: none
+
+
+      display: flex
+      flex-direction: column
+      align-items: center
+
+      .top, .bottom
+        display: unset
+
+      .top
+        padding-top: 2rem
+        gap: 2rem
+
+        display: flex
+        flex-direction: column
+        justify-content: center
+        align-items: center
+
+        img
+          width: 8rem
+
+      .links
+        padding-top: 6rem
+        flex-direction: column
+        align-items: center
+        justify-content: center
+        gap: 0.5rem
+
+      .bottom
+        .version
+          color: #787878
+          font-size: 10px
+          font-weight: 100
+
+    main
+      flex-grow: 1
+      margin-left: 19rem
+      padding-bottom: 2rem
