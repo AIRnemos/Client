@@ -35,7 +35,7 @@ namespace Wifi {
     const IPAddress netMask(255, 255, 255, 0);
 
 
-    DNSServer server;
+    // DNSServer server;
 
     std::list<WifiEntry> entries;
 
@@ -74,7 +74,7 @@ namespace Wifi {
         }
     }
 
-    void dnsTask(void * parameter) {
+    /*void dnsTask(void * parameter) {
         server.start(53, "*", apIP);
         log_i("Started DNS-Server!");
 
@@ -83,14 +83,14 @@ namespace Wifi {
            server.processNextRequest();
            vTaskDelay(500 / portTICK_PERIOD_MS);
         }
-    }
+    }*/
 
     void wifiTask(void * parameter) {
         
         if(Config::wifiMode == WIFI_MODE_ACCESS_POINT) {
-            startAP();
+            startAP(Config::wifiSsid.c_str(), Config::wifiPassword.c_str());
         } else if(Config::wifiMode == WIFI_MODE_WIFI) {
-            connect();   
+            connect(Config::wifiSsid.c_str(), Config::wifiPassword.c_str());   
         }
 
         for(;;) {
@@ -98,7 +98,7 @@ namespace Wifi {
 
             // TODO: fallback and tries
             if((data & WIFI_EVENT_DISCONNECTED_BIT) != 0) {
-                connect();
+                connect(Config::wifiSsid.c_str(), Config::wifiPassword.c_str());
             } else if((data & WIFI_EVENT_STOP_BIT) != 0) {
                 if(isAP())
                     stopAP();
@@ -217,21 +217,21 @@ namespace Wifi {
     }
 
 
-    void startAP() {
+    void startAP(const char *ssid, const char *pass) {
         WiFi.softAPConfig(apIP, apIP, netMask);
-        WiFi.softAP(Config::wifiAPSsid.c_str(), Config::wifiAPPassword.c_str());
-        xTaskCreate(dnsTask, "Wifi-DNS", 4096, NULL, 5, &task_dns);
+        WiFi.softAP(ssid, pass);
+        //xTaskCreate(dnsTask, "Wifi-DNS", 4096, NULL, 5, &task_dns);
 
         // TODO: captive portal not working
     }
 
     void stopAP() {
         vTaskDelete(task_dns);
-        server.stop();
+        //server.stop();
     }
 
-    void connect() {
-        WiFi.begin(Config::wifiSsid.c_str(), Config::wifiPassword.c_str());
+    void connect(const char * ssid, const char * password) {
+        WiFi.begin(ssid, password);
     }
 
     void disconnect() {

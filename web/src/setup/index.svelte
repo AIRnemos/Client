@@ -77,14 +77,19 @@
       name: String(AIRNEMOS_NAME),
       buzzer: "checked",
       wifi: {
-        mode: "wifi",
+        mode: "0",
         ssid: "",
         password: "",
+        retires: -1,
+
+        fallback: {
+          mode: 0,
+          ssid: "",
+          password: "",
+          retires: -1,
+        },
+
         secure: false,
-        ap: {
-          name: "",
-          password: ""
-        }
       }
     }
 

@@ -59,10 +59,10 @@ namespace Wifi {
 
     WifiCheck check(const char * ssid, const char * password);
 
-    void startAP();
+    void startAP(const char * ssid, const char * password);
     void stopAP();
 
-    void connect();
+    void connect(const char * ssid, const char * password);
     void disconnect();
 
     void startNormal();

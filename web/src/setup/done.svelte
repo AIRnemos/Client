@@ -39,14 +39,16 @@ import Fa from "svelte-fa";
             password: "",
             buzzer: data.buzzer == "checked",
             wifi: {
-                mode: data.wifi.mode == "wifi" ? 2 : data.wifi.mode == "ap" ? 1 : 0,
-                fallback: 1,
+                mode: Number(data.wifi.mode),
                 ssid: data.wifi.ssid,
                 password: data.wifi.password,
                 retires: -1,
-                ap: {
-                    ssid: data.wifi.ap.ssid,
-                    password: data.wifi.ap.password
+
+                fallback: {
+                    mode: 0,
+                    ssid: "",
+                    password: "",
+                    retires: -1,
                 }
             },
         }

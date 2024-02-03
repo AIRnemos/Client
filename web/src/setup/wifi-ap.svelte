@@ -25,19 +25,19 @@
     }
 
     export function previos(index) {
-        if(data.wifi.ap.name == `AIRnemos - ${data.name}`) data.wifi.ap.name = ""
+        if(data.wifi.ssid == `AIRnemos - ${data.name}`) data.wifi.ssid = ""
         return index - 1
     }
 
     onMount(() => {
-        if(data.wifi.ap.name == "") data.wifi.ap.name = `AIRnemos - ${data.name}`
+        if(data.wifi.ssid == "") data.wifi.ssid = `AIRnemos - ${data.name}`
         validate()
     })
 
     function validate() {
         canNext.set((() => {
-            if(data.wifi.ap.name == undefined || data.wifi.ap.name.length == 0) return false
-            if(data.wifi.ap.password == undefined || data.wifi.ap.password.length <= 8) return false
+            if(data.wifi.ssid == undefined || data.wifi.ssid.length == 0) return false
+            if(data.wifi.password == undefined || data.wifi.password.length <= 8) return false
 
             return true
         })())
@@ -46,5 +46,5 @@
     export let data;
 </script>
 
-<Field label="setup_input_label_wifi_ap_name" name="ap-name" type="text" bind:value={data.wifi.ap.name} on:change={validate} />
-<Field label="setup_input_label_wifi_ap_password" name="ap-password" type="password" bind:value={data.wifi.ap.password} on:change={validate}/>
+<Field label="setup_input_label_wifi_ap_name" name="ap-name" type="text" bind:value={data.wifi.ssid} on:change={validate} />
+<Field label="setup_input_label_wifi_ap_password" name="ap-password" type="password" bind:value={data.wifi.password} on:change={validate}/>

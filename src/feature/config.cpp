@@ -42,17 +42,17 @@ namespace Config
     bool buzzer = true;
 
     byte wifiMode = WIFI_MODE_ACCESS_POINT;
-    byte wifiFallback = WIFI_MODE_NONE;
     String wifiSsid;
     String wifiPassword;
     int16_t wifiRetries;
-    String wifiAPSsid;
-    String wifiAPPassword;
+
+    byte wifiFallback = WIFI_MODE_NONE;
+    String wifiFallbackSsid;
+    String wifiFallbackPassword;
+    int16_t wifiFallbackRetries;
 
     void setSetup() {
         needSetup = true;
-
-        wifiAPSsid = "AIRnemos - " + defaultName; 
     }
 
 
@@ -173,12 +173,12 @@ namespace Config
             if(json["wifi"]["mode"] == 2 && !json["wifi"].containsKey("retry")) return false;
         }
         
-        if (!json.containsKey("fallback")) return false;
-        if (!json["fallback"].containsKey("mode")) return false;
+        if (!json["wifi"].containsKey("fallback")) return false;
+        if (!json["wifi"]["fallback"].containsKey("mode")) return false;
        
-        if (json["fallback"]["mode"] > 0) {
-            if (!json["fallback"].containsKey("ssid")) return false;
-            if (!json["fallback"].containsKey("password")) return false;
+        if (json["wifi"]["fallback"]["mode"] > 0) {
+            if (!json["wifi"]["fallback"].containsKey("ssid")) return false;
+            if (!json["wifi"]["fallback"].containsKey("password")) return false;
         }
 
         JsonObject object = json.to<JsonObject>();
@@ -222,14 +222,15 @@ namespace Config
 
         JsonObject wifi = (*doc).createNestedObject("wifi");
         wifi["mode"] = wifiMode;
-        wifi["fallback"] = wifiFallback;
         wifi["ssid"] = wifiSsid;
         wifi["password"] = wifiPassword;
         wifi["retires"] = wifiRetries;
 
-        JsonObject ap = wifi.createNestedObject("ap");
-        ap["ssid"] = wifiAPSsid;
-        ap["password"] = wifiAPPassword;
+        JsonObject wifiFallback = wifi.createNestedObject("fallback");
+        wifiFallback["mode"] = wifiFallback;
+        wifiFallback["ssid"] = wifiFallbackSsid;
+        wifiFallback["password"] = wifiFallbackPassword;
+        wifiFallback["retires"] = wifiFallbackRetries;
     }
 
     CRGB parseColor(char* color) {
@@ -267,8 +268,6 @@ namespace Config
             JsonObject wifi = (*doc)["wifi"];
             if(wifi.containsKey("mode"))
                 wifiMode = wifi["mode"];
-            if(wifi.containsKey("fallback"))
-                wifiFallback = wifi["fallback"];
             if(wifi.containsKey("ssid"))
                 wifiSsid = wifi["ssid"].as<String>();
             if(wifi.containsKey("password"))
@@ -276,11 +275,17 @@ namespace Config
             if(wifi.containsKey("retires"))
                 wifiRetries = wifi["retires"];
 
-            JsonObject ap = wifi["ap"];
-            if(ap.containsKey("ssid"))
-                wifiAPSsid = ap["ssid"].as<String>();
-            if(ap.containsKey("password"))
-                wifiAPPassword = ap["password"].as<String>();
+            if(wifi.containsKey("fallback")) {
+                JsonObject fallback = wifi["fallback"];
+                if(fallback.containsKey("mode"))
+                    wifiFallback = fallback["mode"];
+                if(fallback.containsKey("ssid"))
+                    wifiFallbackSsid = fallback["ssid"].as<String>();
+                if(fallback.containsKey("password"))
+                    wifiFallbackPassword = fallback["password"].as<String>();
+                if(fallback.containsKey("retires"))
+                    wifiFallbackRetries = fallback["retires"];
+            }
         }
     }
     

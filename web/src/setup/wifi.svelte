@@ -23,8 +23,8 @@
     import { _ } from "svelte-i18n";
 
     export function next(index) {
-        if(data.wifi.mode == "none") return index + 5
-        if(data.wifi.mode == "wifi") return index + 2
+        if(data.wifi.mode == 0) return index + 5
+        if(data.wifi.mode == 2) return index + 2
         return index + 1
     }
 
@@ -40,7 +40,7 @@
 </script>
 
 <Field type="select" name="wifi" label="setup_input_label_wifi" bind:value={data.wifi.mode}>
-    <option value="wifi">{ $_("setup_input_label_wifi_wifi") }</option>
-    <option value="ap">{ $_("setup_input_label_wifi_ap") }</option>
-    <option value="none">{ $_("setup_input_label_wifi_none") }</option>
+    <option value="2">{ $_("setup_input_label_wifi_wifi") }</option>
+    <option value="1">{ $_("setup_input_label_wifi_ap") }</option>
+    <option value="0">{ $_("setup_input_label_wifi_none") }</option>
 </Field>

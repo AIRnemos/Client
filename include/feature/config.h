@@ -49,12 +49,15 @@ namespace Config {
     extern uint16_t thresholdBad;
 
     extern byte wifiMode;
-    extern byte wifiFallback;
     extern String wifiSsid;
     extern String wifiPassword;
     extern int16_t wifiRetries;
-    extern String wifiAPSsid;
-    extern String wifiAPPassword;
+
+    
+    extern byte wifiFallback;
+    extern String wifiFallbackSsid;
+    extern String wifiFallbackPassword;
+    extern int16_t wifiFallbackRetries;
 
     bool initConfig();
     bool setupConfig(DynamicJsonDocument json);

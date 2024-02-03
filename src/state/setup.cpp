@@ -42,7 +42,7 @@ namespace StateSetup {
     void start() {
         xTaskCreate(ledTask, "LED-Setup", 2048, NULL, 5, &task_led);
 
-        Wifi::startAP();
+        Wifi::startAP(("AIRnemos - " + Config::defaultName).c_str(), NULL);
         Wifi::startScaning();
 
         wifi_scan_hander = Web::server.on("/api/wifi/scan", HTTP_GET, [] (AsyncWebServerRequest *request) {

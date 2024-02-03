@@ -25,8 +25,8 @@
     }
 
     export function previos(index) {
-        if(data.wifi.mode == "none") return index - 5
-        if(data.wifi.mode == "ap") return index - 4
+        if(data.wifi.mode == 0) return index - 5
+        if(data.wifi.mode == 1) return index - 4
         return index - 3
     }
 
@@ -39,9 +39,9 @@
 
 <h1>{ $_("setup_check_title")}</h1>
 <p>{ $_("setup_check_text")}</p>
-{#if data.wifi.mode == "wifi"}
+{#if data.wifi.mode == 2}
     <p>{ $_("setup_check_wifi", {values:{ip: data.wifi.ip}})}</p>
-{:else if data.wifi.mode == "ap"}
+{:else if data.wifi.mode == 1}
     <p>{ $_("setup_check_ap")}</p>
 {:else}
     <p>{ $_("setup_check_none")}</p>
