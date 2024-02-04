@@ -18,6 +18,8 @@
 #if !defined(_MAIN_H)
 #define _MAIN_H
 
+#include "hardware/firmware.h"
+
 #include <Arduino.h>
 
 #include "feature/config.h"

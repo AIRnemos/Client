@@ -204,7 +204,7 @@ namespace Config
         serializeJson(doc, config);
         config.close();
         doc.garbageCollect();
-    }
+    }    
 
     void get(StaticJsonDocument<512>* doc) {
         (*doc)["name"] = name; 
@@ -226,11 +226,11 @@ namespace Config
         wifi["password"] = wifiPassword;
         wifi["retires"] = wifiRetries;
 
-        JsonObject wifiFallback = wifi.createNestedObject("fallback");
-        wifiFallback["mode"] = wifiFallback;
-        wifiFallback["ssid"] = wifiFallbackSsid;
-        wifiFallback["password"] = wifiFallbackPassword;
-        wifiFallback["retires"] = wifiFallbackRetries;
+        JsonObject wifiFallbackJ = wifi.createNestedObject("fallback");
+        wifiFallbackJ["mode"] = wifiFallback;
+        wifiFallbackJ["ssid"] = wifiFallbackSsid;
+        wifiFallbackJ["password"] = wifiFallbackPassword;
+        wifiFallbackJ["retires"] = wifiFallbackRetries;
     }
 
     CRGB parseColor(char* color) {
