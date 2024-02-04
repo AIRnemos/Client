@@ -18,7 +18,7 @@
 */
 import Fa from "svelte-fa";
     import { onMount } from "svelte";
-    import { faCircleNotch, faExclamation } from "@fortawesome/free-solid-svg-icons";
+    import { faCheck, faCircleNotch, faExclamation } from "@fortawesome/free-solid-svg-icons";
     import { _ } from "svelte-i18n";
     import { APIClient } from "../lib/api";
 
@@ -79,7 +79,7 @@ import Fa from "svelte-fa";
     </div>
 {:else if done}
     <div class="center">
-        <Fa icon={faExclamation} size="2x" />
+        <Fa icon={faCheck} size="2x" />
         <span>{$_("done")}</span>
     </div>
 {:else}
