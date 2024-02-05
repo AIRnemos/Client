@@ -97,18 +97,25 @@ namespace StateSetup {
 
             init = true;
 
-            Web::server.removeHandler(&wifi_scan_hander);
-            Web::server.removeHandler(&wifi_check_handler);
-            Web::server.removeHandler(&handler);
-
-            Wifi::stopScaning();
-            Wifi::stopAP();
-            Web::stop();
-
-            vTaskDelete(task_led);
-            StateNormal::start();
+            vTaskDelay(500 / portTICK_PERIOD_MS);
+            State::switchState(STATE_NORMAL);
         });
 
         Web::start();
+    }
+
+    void stop() {
+        Web::stop();
+
+        Web::server.removeHandler(&wifi_scan_hander);
+        Web::server.removeHandler(&wifi_check_handler);
+        Web::server.removeHandler(&handler);
+        
+        Wifi::stopScaning();
+        Wifi::stopAP();
+
+        vTaskDelete(task_led);
+
+        StateNormal::start();
     }
 }

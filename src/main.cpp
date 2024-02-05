@@ -54,10 +54,7 @@ void setup() {
 
   vTaskDelete(task_led);
 
-  if(*Config::mustSetup())
-    StateSetup::start();
-  else
-    StateNormal::start();
+  State::init(*Config::mustSetup() ? STATE_SETUP : STATE_NORMAL);
 
   log_i("Started airnemos core.");
   vTaskDelete(NULL);
