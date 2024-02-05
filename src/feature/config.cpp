@@ -170,7 +170,7 @@ namespace Config
             if (!json["wifi"].containsKey("ssid")) return false;
             if (!json["wifi"].containsKey("password")) return false;
             
-            if(json["wifi"]["mode"] == 2 && !json["wifi"].containsKey("retry")) return false;
+            if(json["wifi"]["mode"] == 2 && !json["wifi"].containsKey("retires")) return false;
         }
         
         if (!json["wifi"].containsKey("fallback")) return false;
