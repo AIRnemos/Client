@@ -43,7 +43,7 @@ namespace Wifi {
     EventGroupHandle_t eventGroup;
 
     TaskHandle_t task_scan;
-    TaskHandle_t task_dns;
+    //TaskHandle_t task_dns;
     TaskHandle_t task_wifi;
 
     void scanTask(void * parameter) { 
@@ -226,7 +226,8 @@ namespace Wifi {
     }
 
     void stopAP() {
-        vTaskDelete(task_dns);
+        WiFi.softAPdisconnect();
+        //vTaskDelete(task_dns);
         //server.stop();
     }
 
