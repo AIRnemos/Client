@@ -181,7 +181,7 @@ namespace Config
             if (!json["wifi"]["fallback"].containsKey("password")) return false;
         }
 
-        JsonObject object = json.to<JsonObject>();
+        JsonObject object = json.as<JsonObject>();
         set(&object);
 
         File versionFile = LittleFS.open("/VERSION", "w");
