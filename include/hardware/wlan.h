@@ -53,6 +53,8 @@ namespace Wifi {
 
     void init();
 
+    void startManagment();
+
     void startScaning();
     void stopScaning();
     void getWifis(JsonArray* array);

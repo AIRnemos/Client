@@ -148,7 +148,9 @@ namespace Wifi {
         WiFi.onEvent(wifiGotIp, ARDUINO_EVENT_WIFI_STA_GOT_IP);
 
         WiFi.mode(WIFI_MODE_APSTA);
+    }
 
+    void startManagment() {
         xTaskCreate(scanTask, "Wifi-Scan", 4096, NULL, 5, &task_scan);
     }
 
