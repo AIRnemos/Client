@@ -20,8 +20,6 @@
 
 #define GITHUB_REPO "AIRnemos/Client"
 #define GITHUB_ASSET "student_company.bin"
-//#define GITHUB_REPO "Aircoookie/WLED"
-//#define GITHUB_ASSET "WLED_0.14.4_ESP32-S3_8MB.bin"
 
 // Device
 #define BUZZER_PIN 6
