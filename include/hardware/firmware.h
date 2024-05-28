@@ -19,18 +19,21 @@
 #define _FIRMWARE_H
 
 #define GITHUB_REPO "AIRnemos/Client"
-#define GITHUB_ASSET "student_company.bin"
 
-// Device
-#define BUZZER_PIN 6
-#define LED_PIN 48
-#define SDA_PIN 5
-#define SCL_PIN 4
+#ifdef TYPE_STUDENT_COMPANY
+    #define GITHUB_ASSET "student_company.bin"
 
-// Buzzer
-#define BUZZER_DURATION 286
+    // Device
+    #define BUZZER_PIN 6
+    #define LED_PIN 48
+    #define SDA_PIN 5
+    #define SCL_PIN 4
 
-// Leds
-#define LEDS 40
+    // Buzzer
+    #define BUZZER_DURATION 286
+
+    // Leds
+    #define LEDS 40
+#endif
 
 #endif
