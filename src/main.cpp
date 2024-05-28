@@ -1,6 +1,6 @@
 /*
     AIRnemos is a software for CO2 meter.
-    Copyright (C) 2023 Quentin Schuster
+    Copyright (C) 2023-2024 Quentin Schuster
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,16 +33,18 @@ void ledTask(void * parameter) {
 void setup() {
   Serial.begin(115200);
   Serial.println();
-  
+
   log_i("Starting airnemos v%s...", VERSION);
 
   if (Config::initConfig()) {
+    // TODO: add reset option
     error(false);
   }
 
   Wifi::init();
   LED::init();
   Buzzer::init();
+  OTAUpdate::init();
 
   xTaskCreatePinnedToCore(ledTask, "LED-Main", 2048, NULL, 5, &task_led, 0);
 

@@ -1,6 +1,6 @@
 /*
     AIRnemos is a software for CO2 meter.
-    Copyright (C) 2023 Quentin Schuster
+    Copyright (C) 2023-2024 Quentin Schuster
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,6 +17,11 @@
 */
 #if !defined(_FIRMWARE_H)
 #define _FIRMWARE_H
+
+#define GITHUB_REPO "AIRnemos/Client"
+#define GITHUB_ASSET "student_company.bin"
+//#define GITHUB_REPO "Aircoookie/WLED"
+//#define GITHUB_ASSET "WLED_0.14.4_ESP32-S3_8MB.bin"
 
 // Device
 #define BUZZER_PIN 6

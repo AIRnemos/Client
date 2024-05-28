@@ -1,6 +1,6 @@
 /*
     AIRnemos is a software for CO2 meter.
-    Copyright (C) 2023-2024 Quentin Schuster
+    Copyright (C) 2024 Quentin Schuster
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,26 +15,26 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-#if !defined(_NORMAL_H)
-#define _NORMAL_H
 
+#if !defined(_UPDATE_H)
+#define _UPDATE_H
+
+#include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include <WiFiClientSecure.h>
+#include <HTTPUpdate.h>
 
-#include "feature/config.h"
-#include "feature/update.h"
+#include "hardware/firmware.h"
 #include "hardware/wlan.h"
-#include "feature/web.h"
-#include "utils.h"
-#include "hardware/sensor.h"
-#include "hardware/led.h"
-#include "hardware/buzzer.h"
-#include "hardware/rtc.h"
+#include "version.h"
 
-#define BUFFER_SIZE 60
-
-namespace StateNormal {
+namespace OTAUpdate
+{
+    
+    void init();
     void start();
     void stop();
-}
+
+} // namespace Update
 
 #endif

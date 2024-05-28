@@ -1,6 +1,6 @@
 /*
     AIRnemos is a software for CO2 meter.
-    Copyright (C) 2023 Quentin Schuster
+    Copyright (C) 2023-2024 Quentin Schuster
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #define WIFI_EVENT_CONNECTED_BIT (1UL << 1UL)
 #define WIFI_EVENT_DISCONNECTED_BIT (1UL << 2UL)
 
-#define WIFI_EVENT_STOP_BIT (1UL << 2UL)
+#define WIFI_EVENT_STOP_BIT (1UL << 3UL)
 
 #define WIFI_SCAN_START 1
 #define WIFI_SCAN_STOP 2

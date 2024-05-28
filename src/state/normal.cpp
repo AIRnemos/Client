@@ -1,6 +1,6 @@
 /*
     AIRnemos is a software for CO2 meter.
-    Copyright (C) 2023 Quentin Schuster
+    Copyright (C) 2023-2024 Quentin Schuster
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 #include "state/normal.h"
-#include <HTTPUpdate.h>
 
 namespace StateNormal {
 
@@ -70,6 +69,7 @@ namespace StateNormal {
                 measurementsHum[i] = Sensor::humidity;
 
                 if(beforeBad != isBad && Config::buzzer) {
+                    // Move to led
                     if(isBad)
                         Buzzer::high();
                     else
@@ -88,7 +88,9 @@ namespace StateNormal {
     void start() {
         xTaskCreate(ledTask, "LED-Normal", 2048, NULL, 5, &task_led);
 
+        Wifi::startNormal();
         Web::start();
+        OTAUpdate::start();
 
         while (Sensor::read())
         {
@@ -101,9 +103,16 @@ namespace StateNormal {
     void stop() {
         vTaskDelete(task_led);
         vTaskDelete(task_loop);
+        
+        OTAUpdate::stop();
+        Web::stop();
+        Wifi::stopNormal();
     }
 
     // -------------
+
+
+#include <HTTPUpdate.h>
 
     AsyncCallbackWebHandler handler_login;
 

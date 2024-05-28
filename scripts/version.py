@@ -1,5 +1,5 @@
 #    AIRnemos is a software for CO2 meter.
-#    Copyright (C) 2023 Quentin Schuster
+#    Copyright (C) 2023-2024 Quentin Schuster
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 
 import os
 
-VERSION = os.getenv('VERSION', 'local-build')
+VERSION = os.getenv('VERSION', '0.0.0')
 
 if not os.path.exists("VERSION"):
     open("VERSION", "x")
