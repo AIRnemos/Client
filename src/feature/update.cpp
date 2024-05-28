@@ -39,6 +39,7 @@ RNZu9YO6bVi9JNlWSOrvxKJGgYhqOkbRqZtNyWHa0V1Xahg=
 
     WiFiClientSecure wifiClient;
     int16_t firmwareVersion[3];
+    TaskHandle_t task_handle;
 
     bool extractVersion(char* versionString, int16_t *versionParts);
     bool isHigher(int16_t *one, int16_t *two);
@@ -146,11 +147,16 @@ RNZu9YO6bVi9JNlWSOrvxKJGgYhqOkbRqZtNyWHa0V1Xahg=
     }
 
     void start() {
-       xTaskCreate(task, "Update-Task", 16348, NULL, 5, NULL);
+        if (task_handle != NULL) return;
+
+        xTaskCreate(task, "Update-Task", 16348, NULL, 5, &task_handle);
     }
 
     void stop() {
-        vTaskDelete(task);
+        if (task_handle == NULL) return;
+
+        vTaskDelete(task_handle);
+        task_handle = NULL;
     }
 
     bool extractVersion(char* versionString, int16_t *versionParts) {
