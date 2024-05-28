@@ -95,6 +95,9 @@ namespace Web {
             request->send_P(200, "application/javascript", (char*) index_js_data);
         });
 
+        server.on("/hotspot-detect.html", [](AsyncWebServerRequest *request) { // iphone doesn't load normal
+            request->send(200, "text/html", "<html><head><meta http-equiv=\"refresh\" content=\"0; url=http://" + WiFi.softAPIP().toString() + "/\" /></head></html>");
+        });
         server.onNotFound([] (AsyncWebServerRequest *request) {
             if(ON_AP_FILTER(request))
                 request->redirect("http://" + WiFi.softAPIP().toString() + "/");

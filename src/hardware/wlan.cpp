@@ -34,8 +34,7 @@ namespace Wifi {
     const IPAddress apIP(192, 168, 1, 1);
     const IPAddress netMask(255, 255, 255, 0);
 
-
-    // DNSServer server;
+    DNSServer server;
 
     std::list<WifiEntry> entries;
 
@@ -43,7 +42,7 @@ namespace Wifi {
     EventGroupHandle_t eventGroup;
 
     TaskHandle_t task_scan;
-    //TaskHandle_t task_dns;
+    TaskHandle_t task_dns;
     TaskHandle_t task_wifi;
 
     void scanTask(void * parameter) { 
@@ -74,7 +73,8 @@ namespace Wifi {
         }
     }
 
-    /*void dnsTask(void * parameter) {
+    void dnsTask(void * parameter) {
+        server.setErrorReplyCode(DNSReplyCode::NoError);
         server.start(53, "*", apIP);
         log_i("Started DNS-Server!");
 
@@ -83,7 +83,7 @@ namespace Wifi {
            server.processNextRequest();
            vTaskDelay(500 / portTICK_PERIOD_MS);
         }
-    }*/
+    }
 
     void wifiTask(void * parameter) {
         
@@ -132,9 +132,19 @@ namespace Wifi {
     }
     void wifiDisconnected(WiFiEvent_t event, WiFiEventInfo_t info) {
         xEventGroupSetBits(eventGroup, WIFI_EVENT_DISCONNECTED_BIT);
+        
+        MDNS.end();
     }
     void wifiGotIp(WiFiEvent_t event, WiFiEventInfo_t info) {
         xEventGroupSetBits(eventGroup, WIFI_EVENT_GOT_IP_BIT);
+
+        MDNS.begin(Config::name.c_str());
+    }
+    void apStart(WiFiEvent_t event, WiFiEventInfo_t info) {
+        xTaskCreate(dnsTask, "Wifi-DNS", 4096, NULL, 5, &task_dns);
+    }
+    void apStop(WiFiEvent_t event, WiFiEventInfo_t info) {
+        vTaskDelete(task_dns);
     }
 
 
@@ -146,8 +156,12 @@ namespace Wifi {
         WiFi.onEvent(wifiConnected, ARDUINO_EVENT_WIFI_STA_CONNECTED);
         WiFi.onEvent(wifiDisconnected, ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
         WiFi.onEvent(wifiGotIp, ARDUINO_EVENT_WIFI_STA_GOT_IP);
+        WiFi.onEvent(apStart, ARDUINO_EVENT_WIFI_AP_START);
+        WiFi.onEvent(apStop, ARDUINO_EVENT_WIFI_AP_STOP);
 
+        WiFi.persistent(false);
         WiFi.mode(WIFI_MODE_APSTA);
+        WiFi.setHostname(Config::name.c_str());
 
         xTaskCreate(scanTask, "Wifi-Scan", 4096, NULL, 5, &task_scan);
     }
