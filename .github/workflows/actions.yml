@@ -47,7 +47,7 @@ jobs:
         with:
           name: firmware
           path: |
-            .pio/build/school_company/firmware.bin
+            .pio/build/student_company/firmware.bin
               
   release:
     runs-on: ubuntu-latest
