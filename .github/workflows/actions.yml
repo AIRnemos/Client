@@ -48,6 +48,7 @@ jobs:
           name: firmware
           path: |
             .pio/build/student_company/firmware.bin
+            .pio/build/s3/firmware.bin
               
   release:
     runs-on: ubuntu-latest

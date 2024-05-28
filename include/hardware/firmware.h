@@ -36,4 +36,20 @@
     #define LEDS 40
 #endif
 
+#ifdef TYPE_S3
+    #define GITHUB_ASSET "s3.bin"
+
+    // Device
+    #define BUZZER_PIN 6
+    #define LED_PIN 7
+    #define SDA_PIN 5
+    #define SCL_PIN 4
+
+    // Buzzer
+    #define BUZZER_DURATION 286
+
+    // Leds
+    #define LEDS 40
+#endif
+
 #endif
