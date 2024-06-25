@@ -1,3 +1,20 @@
+/*
+    AIRnemos is a software for CO2 meter.
+    Copyright (C) 2023 Quentin Schuster
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 #include "feature/config.h"
 
 namespace Config
@@ -25,17 +42,17 @@ namespace Config
     bool buzzer = true;
 
     byte wifiMode = WIFI_MODE_ACCESS_POINT;
-    byte wifiFallback = WIFI_MODE_NONE;
     String wifiSsid;
     String wifiPassword;
     int16_t wifiRetries;
-    String wifiAPSsid;
-    String wifiAPPassword;
+
+    byte wifiFallback = WIFI_MODE_NONE;
+    String wifiFallbackSsid;
+    String wifiFallbackPassword;
+    int16_t wifiFallbackRetries;
 
     void setSetup() {
         needSetup = true;
-
-        wifiAPSsid = "AIRnemos - " + defaultName; 
     }
 
 
@@ -153,18 +170,18 @@ namespace Config
             if (!json["wifi"].containsKey("ssid")) return false;
             if (!json["wifi"].containsKey("password")) return false;
             
-            if(json["wifi"]["mode"] == 2 && !json["wifi"].containsKey("retry")) return false;
+            if(json["wifi"]["mode"] == 2 && !json["wifi"].containsKey("retires")) return false;
         }
         
-        if (!json.containsKey("fallback")) return false;
-        if (!json["fallback"].containsKey("mode")) return false;
+        if (!json["wifi"].containsKey("fallback")) return false;
+        if (!json["wifi"]["fallback"].containsKey("mode")) return false;
        
-        if (json["fallback"]["mode"] > 0) {
-            if (!json["fallback"].containsKey("ssid")) return false;
-            if (!json["fallback"].containsKey("password")) return false;
+        if (json["wifi"]["fallback"]["mode"] > 0) {
+            if (!json["wifi"]["fallback"].containsKey("ssid")) return false;
+            if (!json["wifi"]["fallback"].containsKey("password")) return false;
         }
 
-        JsonObject object = json.to<JsonObject>();
+        JsonObject object = json.as<JsonObject>();
         set(&object);
 
         File versionFile = LittleFS.open("/VERSION", "w");
@@ -187,6 +204,16 @@ namespace Config
         serializeJson(doc, config);
         config.close();
         doc.garbageCollect();
+    }    
+
+    bool reset() {
+        if(!LittleFS.remove("/config.json")) return false;
+        if(!LittleFS.remove("/VERSION")) return false;
+
+        nvs_flash_erase();
+        nvs_flash_init();
+
+        return true;
     }
 
     void get(StaticJsonDocument<512>* doc) {
@@ -205,14 +232,15 @@ namespace Config
 
         JsonObject wifi = (*doc).createNestedObject("wifi");
         wifi["mode"] = wifiMode;
-        wifi["fallback"] = wifiFallback;
         wifi["ssid"] = wifiSsid;
         wifi["password"] = wifiPassword;
         wifi["retires"] = wifiRetries;
 
-        JsonObject ap = wifi.createNestedObject("ap");
-        ap["ssid"] = wifiAPSsid;
-        ap["password"] = wifiAPPassword;
+        JsonObject wifiFallbackJ = wifi.createNestedObject("fallback");
+        wifiFallbackJ["mode"] = wifiFallback;
+        wifiFallbackJ["ssid"] = wifiFallbackSsid;
+        wifiFallbackJ["password"] = wifiFallbackPassword;
+        wifiFallbackJ["retires"] = wifiFallbackRetries;
     }
 
     CRGB parseColor(char* color) {
@@ -250,8 +278,6 @@ namespace Config
             JsonObject wifi = (*doc)["wifi"];
             if(wifi.containsKey("mode"))
                 wifiMode = wifi["mode"];
-            if(wifi.containsKey("fallback"))
-                wifiFallback = wifi["fallback"];
             if(wifi.containsKey("ssid"))
                 wifiSsid = wifi["ssid"].as<String>();
             if(wifi.containsKey("password"))
@@ -259,11 +285,17 @@ namespace Config
             if(wifi.containsKey("retires"))
                 wifiRetries = wifi["retires"];
 
-            JsonObject ap = wifi["ap"];
-            if(ap.containsKey("ssid"))
-                wifiAPSsid = ap["ssid"].as<String>();
-            if(ap.containsKey("password"))
-                wifiAPPassword = ap["password"].as<String>();
+            if(wifi.containsKey("fallback")) {
+                JsonObject fallback = wifi["fallback"];
+                if(fallback.containsKey("mode"))
+                    wifiFallback = fallback["mode"];
+                if(fallback.containsKey("ssid"))
+                    wifiFallbackSsid = fallback["ssid"].as<String>();
+                if(fallback.containsKey("password"))
+                    wifiFallbackPassword = fallback["password"].as<String>();
+                if(fallback.containsKey("retires"))
+                    wifiFallbackRetries = fallback["retires"];
+            }
         }
     }
     

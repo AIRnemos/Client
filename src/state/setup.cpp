@@ -1,3 +1,20 @@
+/*
+    AIRnemos is a software for CO2 meter.
+    Copyright (C) 2023 Quentin Schuster
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 #include "state/setup.h"
 
 namespace StateSetup {
@@ -25,7 +42,7 @@ namespace StateSetup {
     void start() {
         xTaskCreate(ledTask, "LED-Setup", 2048, NULL, 5, &task_led);
 
-        Wifi::startAP();
+        Wifi::startAP(("AIRnemos - " + Config::defaultName).c_str(), NULL);
         Wifi::startScaning();
 
         wifi_scan_hander = Web::server.on("/api/wifi/scan", HTTP_GET, [] (AsyncWebServerRequest *request) {
@@ -80,18 +97,25 @@ namespace StateSetup {
 
             init = true;
 
-            Web::server.removeHandler(&wifi_scan_hander);
-            Web::server.removeHandler(&wifi_check_handler);
-            Web::server.removeHandler(&handler);
-
-            Wifi::stopScaning();
-            Wifi::stopAP();
-            Web::stop();
-
-            vTaskDelete(task_led);
-            StateNormal::start();
+            vTaskDelay(500 / portTICK_PERIOD_MS);
+            State::switchState(STATE_NORMAL);
         });
 
         Web::start();
+    }
+
+    void stop() {
+        Web::stop();
+
+        Web::server.removeHandler(&wifi_scan_hander);
+        Web::server.removeHandler(&wifi_check_handler);
+        Web::server.removeHandler(&handler);
+        
+        Wifi::stopScaning();
+        Wifi::stopAP();
+
+        vTaskDelete(task_led);
+
+        StateNormal::start();
     }
 }

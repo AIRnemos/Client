@@ -15,18 +15,23 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-#if !defined(_SETUP_H)
-#define _SETUP_H
+#if !defined(STATE_MANAGER)
+#define STATE_MANAGER
 
-#include "feature/config.h"
-#include "hardware/wlan.h"
-#include "feature/web.h"
-#include "state/manager.h"
-#include "hardware/led.h"
+#include <Arduino.h>
 
-namespace StateSetup {
-    void start();
-    void stop();
-}
+#include "state/setup.h"
+#include "state/normal.h"
 
-#endif
+#define STATE_SETUP     0
+#define STATE_NORMAL    1
+
+namespace State
+{
+
+    void init(byte mode);   
+    void switchState(byte mode);
+    
+} // namespace State
+
+#endif // STATE_MANAGER

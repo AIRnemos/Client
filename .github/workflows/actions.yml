@@ -42,11 +42,16 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}${{ github.ref_name != 'main' && format('-development-{0}', github.sha) || ''}}
 
+      - name: copy firmware
+        run: cp .pio/build/student_company/firmware.bin student_company.bin && cp .pio/build/s3/firmware.bin s3.bin
+
       - name: Save Firmware
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: firmware
-          path: .pio/build/AIRnemos/firmware.bin
+          path: |
+            student_company.bin
+            s3.bin
               
   release:
     runs-on: ubuntu-latest
@@ -89,7 +94,7 @@ jobs:
         with:
           name: Version ${{ steps.version.outputs.version }}
           draft: true
-          artifacts: "firmware.bin"
+          artifacts: "student_company.bin,s3.bin"
           tag: v${{ steps.version.outputs.version }}
 
 

@@ -60,6 +60,10 @@
     "page_settings_button_update": "Update to {version}",
     "page_settings_button_upload_and_update": "Upload and Update",
 
+    "page_settings_reset_title": "Reset",
+    "page_settings_reset_description": "Reset the CO₂ traffic light to default settings!",
+    "page_settings_reset_button": "Reset",
+
     "page_settings_uploading": "Uploading",
     "page_settings_updating": "Updating",
     "page_settings_restarting": "Restarting",

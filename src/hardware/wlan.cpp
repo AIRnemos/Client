@@ -1,3 +1,20 @@
+/*
+    AIRnemos is a software for CO2 meter.
+    Copyright (C) 2023-2024 Quentin Schuster
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 #include "hardware/wlan.h"
 
 #define WIFI_EVENT_GOT_IP_BIT (1UL << 0UL)
@@ -5,7 +22,7 @@
 #define WIFI_EVENT_CONNECTED_BIT (1UL << 1UL)
 #define WIFI_EVENT_DISCONNECTED_BIT (1UL << 2UL)
 
-#define WIFI_EVENT_STOP_BIT (1UL << 2UL)
+#define WIFI_EVENT_STOP_BIT (1UL << 3UL)
 
 #define WIFI_SCAN_START 1
 #define WIFI_SCAN_STOP 2
@@ -16,7 +33,6 @@ namespace Wifi {
 
     const IPAddress apIP(192, 168, 1, 1);
     const IPAddress netMask(255, 255, 255, 0);
-
 
     DNSServer server;
 
@@ -58,6 +74,7 @@ namespace Wifi {
     }
 
     void dnsTask(void * parameter) {
+        server.setErrorReplyCode(DNSReplyCode::NoError);
         server.start(53, "*", apIP);
         log_i("Started DNS-Server!");
 
@@ -71,9 +88,9 @@ namespace Wifi {
     void wifiTask(void * parameter) {
         
         if(Config::wifiMode == WIFI_MODE_ACCESS_POINT) {
-            startAP();
+            startAP(Config::wifiSsid.c_str(), Config::wifiPassword.c_str());
         } else if(Config::wifiMode == WIFI_MODE_WIFI) {
-            connect();   
+            connect(Config::wifiSsid.c_str(), Config::wifiPassword.c_str());   
         }
 
         for(;;) {
@@ -81,7 +98,7 @@ namespace Wifi {
 
             // TODO: fallback and tries
             if((data & WIFI_EVENT_DISCONNECTED_BIT) != 0) {
-                connect();
+                connect(Config::wifiSsid.c_str(), Config::wifiPassword.c_str());
             } else if((data & WIFI_EVENT_STOP_BIT) != 0) {
                 if(isAP())
                     stopAP();
@@ -115,9 +132,19 @@ namespace Wifi {
     }
     void wifiDisconnected(WiFiEvent_t event, WiFiEventInfo_t info) {
         xEventGroupSetBits(eventGroup, WIFI_EVENT_DISCONNECTED_BIT);
+        
+        MDNS.end();
     }
     void wifiGotIp(WiFiEvent_t event, WiFiEventInfo_t info) {
         xEventGroupSetBits(eventGroup, WIFI_EVENT_GOT_IP_BIT);
+
+        MDNS.begin(Config::name.c_str());
+    }
+    void apStart(WiFiEvent_t event, WiFiEventInfo_t info) {
+        xTaskCreate(dnsTask, "Wifi-DNS", 4096, NULL, 5, &task_dns);
+    }
+    void apStop(WiFiEvent_t event, WiFiEventInfo_t info) {
+        vTaskDelete(task_dns);
     }
 
 
@@ -129,8 +156,12 @@ namespace Wifi {
         WiFi.onEvent(wifiConnected, ARDUINO_EVENT_WIFI_STA_CONNECTED);
         WiFi.onEvent(wifiDisconnected, ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
         WiFi.onEvent(wifiGotIp, ARDUINO_EVENT_WIFI_STA_GOT_IP);
+        WiFi.onEvent(apStart, ARDUINO_EVENT_WIFI_AP_START);
+        WiFi.onEvent(apStop, ARDUINO_EVENT_WIFI_AP_STOP);
 
+        WiFi.persistent(false);
         WiFi.mode(WIFI_MODE_APSTA);
+        WiFi.setHostname(Config::name.c_str());
 
         xTaskCreate(scanTask, "Wifi-Scan", 4096, NULL, 5, &task_scan);
     }
@@ -200,21 +231,22 @@ namespace Wifi {
     }
 
 
-    void startAP() {
+    void startAP(const char *ssid, const char *pass) {
         WiFi.softAPConfig(apIP, apIP, netMask);
-        WiFi.softAP(Config::wifiAPSsid.c_str(), Config::wifiAPPassword.c_str());
-        xTaskCreate(dnsTask, "Wifi-DNS", 4096, NULL, 5, &task_dns);
+        WiFi.softAP(ssid, pass);
+        //xTaskCreate(dnsTask, "Wifi-DNS", 4096, NULL, 5, &task_dns);
 
         // TODO: captive portal not working
     }
 
     void stopAP() {
-        vTaskDelete(task_dns);
-        server.stop();
+        WiFi.softAPdisconnect();
+        //vTaskDelete(task_dns);
+        //server.stop();
     }
 
-    void connect() {
-        WiFi.begin(Config::wifiSsid.c_str(), Config::wifiPassword.c_str());
+    void connect(const char * ssid, const char * password) {
+        WiFi.begin(ssid, password);
     }
 
     void disconnect() {
