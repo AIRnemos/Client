@@ -42,3 +42,13 @@ button, .button
 
         &:disabled
             background: scale-color($primary, $lightness: 20%)
+
+    &.danger
+        background: $danger
+        color: $white
+
+        &:hover
+            background: scale-color($danger, $lightness: -25%) 
+
+        &:disabled
+            background: scale-color($danger, $lightness: 20%)

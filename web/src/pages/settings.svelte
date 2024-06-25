@@ -44,6 +44,9 @@
     let updateError: string = ""
     let versionErr = false
 
+    let reseting = false;
+    let resetError = false;
+
     async function upload(value: CustomEvent<any>) {
         updating = true
         state = UpdateState.UPLOADING
@@ -202,6 +205,20 @@
             versionErr = true
         }
     }
+
+    async function reset() {
+        reseting = true;
+        try {
+            await APIClient.post("/reset")
+
+            setTimeout(() => location.reload(), 3000);
+        } catch(err) {
+            reseting = false
+            resetError = true;
+            return
+        }
+    }
+
     init();
 </script>
     
@@ -229,7 +246,7 @@
         <h1 class="title">{$_("page_settings_update_title")}</h1>
         <p>{$_("page_settings_current_version", { values: { version: AIRNEMOS_VERSION }})}</p>
     
-        {#if AIRNEMOS_AP == true}
+        {#if true}
             <Field name="upload_update" type="file" accept=".bin" uploadText="page_settings_button_upload_and_update" on:upload={upload} label=""/>
         {:else if $newest == undefined}
             <p>{$_("page_settings_serach_for_version")}</p>
@@ -241,6 +258,21 @@
             <p>{$_("page_settings_newer_version")}</p>
             <button class="primary" on:click={update}>{$_("page_settings_button_update", { values: { version: $newest }})}</button>
         {/if}
+    </Card>
+    <Card>
+        <h1>{$_("page_settings_reset_title")}</h1>
+        <p>{$_("page_settings_reset_description")}</p>
+
+        {#if resetError}
+            <p>Error while reseting!</p>
+        {/if}
+       
+        <button class="danger" on:click={reset} disabled={reseting}>
+            {#if reseting}
+                <Fa icon={faCircleNotch} spin="true" size="md" />
+            {/if}
+            {$_("page_settings_reset_button")}
+        </button>
     </Card>
 {/if}
 

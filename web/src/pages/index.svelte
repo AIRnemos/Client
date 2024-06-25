@@ -18,5 +18,5 @@
 */
 import { replace } from "svelte-spa-router";
 
-replace("/settings");
+replace("/dashboard");
 </script>

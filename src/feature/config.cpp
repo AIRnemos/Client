@@ -206,6 +206,16 @@ namespace Config
         doc.garbageCollect();
     }    
 
+    bool reset() {
+        if(!LittleFS.remove("/config.json")) return false;
+        if(!LittleFS.remove("/VERSION")) return false;
+
+        nvs_flash_erase();
+        nvs_flash_init();
+
+        return true;
+    }
+
     void get(StaticJsonDocument<512>* doc) {
         (*doc)["name"] = name; 
         (*doc)["password"] = password; 

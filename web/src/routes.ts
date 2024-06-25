@@ -18,12 +18,12 @@
 import { wrap } from "svelte-spa-router/wrap"
 
 export default {
-    /*"/dashboard": wrap({
+    "/dashboard": wrap({
         asyncComponent: () => import("./pages/dashboard.svelte"),
         userData: {
             title: "page_dashboard_title"
         }
-    }),*/
+    }),
     "/settings": wrap({
         asyncComponent: () => import("./pages/settings.svelte"),
         userData: {

@@ -21,12 +21,38 @@ import Card from "../components/layout/card.svelte"
 import { current } from "../store/measurments";
 </script>
 
-<Card>
-    <h1>CO2 {$current.co2} ppm</h1>
-</Card>
-<Card>
-    <h1>Temperatur {$current.temp} °C</h1>
-</Card>
-<Card>
-    <h1>Luftfeutigkeit {$current.hum} H%</h1>
-</Card>
+<div class="row">
+    <div class="grow">
+        <Card>
+            <span>CO2</span>
+            <span>{$current.co2} ppm</span>
+        </Card>
+    </div>
+    <div class="card">
+        <Card>
+            <span>Temperatur</span>
+            <span>{$current.temp} °C</span>
+        </Card>
+    </div>
+    <div class="card">
+        <Card>
+            <span>Luftfeutigkeit</span>
+            <span>{$current.hum} H%</span>
+        </Card>
+    </div>
+</div>
+
+<style lang="scss">
+.row {
+    display: flex;
+    width: auto;
+}
+
+.card {
+    width: 25%;
+}
+
+.grow {
+    width: 50%;
+}
+</style>

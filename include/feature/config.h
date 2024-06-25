@@ -21,6 +21,7 @@
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <ArduinoJson.h>
+#include <nvs_flash.h>
 #include "hardware/led.h"
 #include "utils.h"
 
@@ -65,6 +66,7 @@ namespace Config {
     bool* mustSetup();
 
     void save();
+    bool reset();
     void get(StaticJsonDocument<512>* doc);
     void set(JsonObject* doc);
 }

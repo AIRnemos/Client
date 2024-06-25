@@ -26,7 +26,7 @@ export const current = writable({
     err: false
 })
 
-export const history = writable<{value: number, date: Date}[]>(null)
+export const history = writable<{value: number, date: Date}[]>([])
 
 let timer;
 async function init() {
