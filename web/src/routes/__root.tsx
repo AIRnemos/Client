@@ -14,7 +14,7 @@ export const Route = createRootRoute({
         <div className="hidden border-r bg-muted/40 md:block">
           <div className="flex h-full max-h-screen flex-col gap-2">
             <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-                <span className="font-semibold">AIRnemos</span> - %name%
+                <span className="font-semibold">AIRnemos</span> - {AIRNEMOS_NAME}
             </div>
             <div className="flex-1">
               <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
@@ -58,7 +58,7 @@ export const Route = createRootRoute({
                   <div
                     className="flex items-center gap-2 text-lg"
                   >
-                    <span className="font-semibold">AIRnemos</span> - %name%
+                    <span className="font-semibold">AIRnemos</span> - {AIRNEMOS_NAME}
                   </div>
                   <Link
                     to="/"
@@ -82,7 +82,7 @@ export const Route = createRootRoute({
               </SheetContent>
             </Sheet>
             <div>
-              <span className="font-semibold">AIRnemos</span> - %name%
+              <span className="font-semibold">AIRnemos</span> - {AIRNEMOS_NAME}
             </div>
           </header>
           <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
