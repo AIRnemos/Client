@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { APIClient } from '@/lib/api'
+import { APIClientWO } from '@/lib/api'
 import { createLazyFileRoute } from '@tanstack/react-router'
 import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react'
 import { useState } from 'react'
@@ -95,11 +95,14 @@ function route() {
         data.append("file", file)
 
         try {
-            await APIClient.body(data).post("/update")
+            await APIClientWO
+                .url("/update")
+                .post(data)
     
             setUpdating(UpdateState.RESTARTING);
     
             setTimeout(() => setUpdating(UpdateState.DONE), 3000);
+            return
         } catch(err: any) {
             if(err?.cause == undefined) {
                 setUpdateInfo({
