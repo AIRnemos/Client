@@ -2,9 +2,12 @@ import { CardContent, CardDescription, CardHeader, CardTitle } from "@/component
 import { Actions, AllActions, Data, Step } from ".."
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Dispatch } from "react"
+import { Dispatch, useState } from "react"
 
 function Component({data, dispatch}: {data: Data, dispatch: Dispatch<AllActions>}) {
+    const [password, setPassword] = useState("");
+    const [password2, setPassword2] = useState("");
+
     return <>
         <CardHeader>
             <CardTitle>Password für {data.wifi_data.ssid}</CardTitle>
@@ -19,8 +22,26 @@ function Component({data, dispatch}: {data: Data, dispatch: Dispatch<AllActions>
                         type="password"
                         required
 
-                        onChange={(event) => dispatch({type: Actions.WIFI, password: event.target.value})}
-                        value={data.wifi_data.password}
+                        onChange={(event) => {
+                            setPassword(event.target.value)
+                            dispatch({type: Actions.WIFI, password: event.target.value == password2 ? event.target.value : ""})
+                        }}
+                        value={password}
+                    />
+                </div>
+
+                <div className="grid gap-2">
+                    <Label htmlFor="password2">Password wiederholen</Label>
+                    <Input
+                        id="password2"
+                        type="password"
+                        required
+
+                        onChange={(event) => {
+                            setPassword2(event.target.value)
+                            dispatch({type: Actions.WIFI, password: event.target.value == password ? event.target.value : ""})
+                        }}
+                        value={password2}
                     />
                 </div>
             </div>

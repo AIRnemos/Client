@@ -10,7 +10,7 @@ import { Wifi } from "./steps/2-wifi";
 import { WifiAP } from "./steps/21-wifi-ap";
 import { WifiSearch } from "./steps/22-wifi-search";
 import { WifiPassword } from "./steps/221-wifi-password";
-import { WifiTest } from "./steps/222-wifi-test";
+//import { WifiTest } from "./steps/222-wifi-test";
 import { Check } from "./steps/3-check";
 import { Done } from "./steps/4-done";
 import { WifisProvider } from "./provider/wifis";
@@ -119,7 +119,7 @@ export function Setup() {
         WifiAP,
         WifiSearch,
         WifiPassword,
-        WifiTest,
+        //WifiTest,
         Check,
         Done
     ]

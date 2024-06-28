@@ -5,6 +5,7 @@ import { useBlockWifi } from "../hook/block"
 import { Dispatch, useEffect, useState } from "react"
 import { APIClient } from "@/lib/api"
 import { Button } from "@/components/ui/button"
+import { retry } from "wretch/middlewares"
 
 function Component({ data, dispatch, next, previos }: { data: Data, next: () => void, previos: () => void, dispatch: Dispatch<AllActions>}) {
     const [error, setError] = useState(false)
@@ -16,17 +17,21 @@ function Component({ data, dispatch, next, previos }: { data: Data, next: () => 
             block(true)
 
             try {
-                const result = await APIClient.url("/wifi/check").post({
+                await APIClient.url("/wifi/check").post({
                     ssid: data.wifi_data.ssid,
                     password: data.wifi_data.password
-                }) as {success: boolean, ip: string}
-    
-    
+                })
+
+                const result = await APIClient
+                    .middlewares([retry()])
+                    .get("/wifi/check") as {success: boolean, ip: string}
+
                 if(!result.success) throw "not connected"
-    
+
                 dispatch({ type: Actions.WIFI, ip: result.ip})
                 
                 next()
+    
             } catch (err) {
                 setError(true)
             }
