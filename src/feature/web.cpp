@@ -32,7 +32,9 @@ namespace Web {
     
     extern const uint8_t index_css_data[] asm("_binary_web_dist_assets_index_css_start");
     extern const uint8_t card_js_data[] asm("_binary_web_dist_assets_card_js_start");
+    extern const uint8_t label_js_data[] asm("_binary_web_dist_assets_label_js_start");
     extern const uint8_t settings_lazy_js_data[] asm("_binary_web_dist_assets_settings_lazy_js_start");
+    extern const uint8_t index2_js_data[] asm("_binary_web_dist_assets_index2_js_start");
     extern const uint8_t index_js_data[] asm("_binary_web_dist_assets_index_js_start");
     extern const uint8_t index_lazy_js_data[] asm("_binary_web_dist_assets_index_lazy_js_start");
    
@@ -57,8 +59,14 @@ namespace Web {
         server.on("/assets/card.js", [] (AsyncWebServerRequest *request) {
             request->send_P(200, "application/javascript", (char*) card_js_data);
         });
+        server.on("/assets/label.js", [] (AsyncWebServerRequest *request) {
+            request->send_P(200, "application/javascript", (char*) label_js_data);
+        });
         server.on("/assets/settings.lazy.js", [] (AsyncWebServerRequest *request) {
             request->send_P(200, "application/javascript", (char*) settings_lazy_js_data);
+        });
+        server.on("/assets/index2.js", [] (AsyncWebServerRequest *request) {
+            request->send_P(200, "application/javascript", (char*) index2_js_data);
         });
         server.on("/assets/index.js", [] (AsyncWebServerRequest *request) {
             request->send_P(200, "application/javascript", (char*) index_js_data);

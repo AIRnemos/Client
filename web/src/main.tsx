@@ -5,7 +5,6 @@ import "./app.css"
 
 import { routeTree } from './routeTree.gen'
 import { MeasurementProvider } from './provider/measurement'
-import { Setup } from './setup'
 
 function stringToBool(value: string): boolean {
   return value == "false" ? false : true;
@@ -22,16 +21,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
-const inner = AIRNEMOS_SETUP ? 
-  <Setup /> :
+async function loadSetup() {
+  const Setup = (await import("./setup")).Setup
+  return <Setup />
+}
 
-  <MeasurementProvider>
-      <RouterProvider router={router} />
-    </MeasurementProvider>
+async function start() {
+  const inner = AIRNEMOS_SETUP ? 
+    await loadSetup() :
+    <MeasurementProvider>
+        <RouterProvider router={router} />
+      </MeasurementProvider>
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    {AIRNEMOS_SETUP}
-    { inner }
-  </React.StrictMode>,
-)
+  ReactDOM.createRoot(document.getElementById('root')!).render(
+    <React.StrictMode>
+      {AIRNEMOS_SETUP}
+      { inner }
+    </React.StrictMode>,
+  ) 
+}
+
+start()
