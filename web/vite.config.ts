@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite'
-import { svelte } from '@sveltejs/vite-plugin-svelte'
+import react from '@vitejs/plugin-react'
+import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
+import path from 'path'
 import { promises as fs} from 'fs'
-
 
 // https://vitejs.dev/config/
 export default defineConfig(async ({mode}) => {
@@ -9,8 +10,14 @@ export default defineConfig(async ({mode}) => {
 
   return {
     plugins: [
-      svelte(),
+      TanStackRouterVite(),
+      react()
     ],
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+      },
+    },
     define: {
       'AIRNEMOS_VERSION': JSON.stringify(version + (mode != "production" ? "-development" : "")),
     },
@@ -27,7 +34,7 @@ export default defineConfig(async ({mode}) => {
     server: {
       proxy: {
         "/api": {
-          target: "http://192.168.4.1",
+          target: "http://192.168.1.52",
           changeOrigin: false,
         }
       }
