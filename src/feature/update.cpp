@@ -20,26 +20,11 @@
 
 namespace OTAUpdate {
 
-    const char *GITHUB_CA PROGMEM = R"CERT(-----BEGIN CERTIFICATE-----
-MIICjzCCAhWgAwIBAgIQXIuZxVqUxdJxVt7NiYDMJjAKBggqhkjOPQQDAzCBiDEL
-MAkGA1UEBhMCVVMxEzARBgNVBAgTCk5ldyBKZXJzZXkxFDASBgNVBAcTC0plcnNl
-eSBDaXR5MR4wHAYDVQQKExVUaGUgVVNFUlRSVVNUIE5ldHdvcmsxLjAsBgNVBAMT
-JVVTRVJUcnVzdCBFQ0MgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMTAwMjAx
-MDAwMDAwWhcNMzgwMTE4MjM1OTU5WjCBiDELMAkGA1UEBhMCVVMxEzARBgNVBAgT
-Ck5ldyBKZXJzZXkxFDASBgNVBAcTC0plcnNleSBDaXR5MR4wHAYDVQQKExVUaGUg
-VVNFUlRSVVNUIE5ldHdvcmsxLjAsBgNVBAMTJVVTRVJUcnVzdCBFQ0MgQ2VydGlm
-aWNhdGlvbiBBdXRob3JpdHkwdjAQBgcqhkjOPQIBBgUrgQQAIgNiAAQarFRaqflo
-I+d61SRvU8Za2EurxtW20eZzca7dnNYMYf3boIkDuAUU7FfO7l0/4iGzzvfUinng
-o4N+LZfQYcTxmdwlkWOrfzCjtHDix6EznPO/LlxTsV+zfTJ/ijTjeXmjQjBAMB0G
-A1UdDgQWBBQ64QmG1M8ZwpZ2dEl23OA1xmNjmjAOBgNVHQ8BAf8EBAMCAQYwDwYD
-VR0TAQH/BAUwAwEB/zAKBggqhkjOPQQDAwNoADBlAjA2Z6EWCNzklwBBHU6+4WMB
-zzuqQhFkoJ2UOQIReVx7Hfpkue4WQrO/isIJxOzksU0CMQDpKmFHjFJKS04YcPbW
-RNZu9YO6bVi9JNlWSOrvxKJGgYhqOkbRqZtNyWHa0V1Xahg=
------END CERTIFICATE-----)CERT";
-
     WiFiClientSecure wifiClient;
     int16_t firmwareVersion[3];
     TaskHandle_t task_handle;
+
+    extern const uint8_t rootca_crt_bundle_start[] asm("_binary_cert_bin_start");
 
     bool extractVersion(char* versionString, int16_t *versionParts);
     bool isHigher(int16_t *one, int16_t *two);
@@ -132,6 +117,7 @@ RNZu9YO6bVi9JNlWSOrvxKJGgYhqOkbRqZtNyWHa0V1Xahg=
     }
 
     void task(void * param) {
+        vTaskDelay(30 * 1000 / portTICK_PERIOD_MS);
         while(true) {
             check();
             vTaskDelay(60 * 60 * 1000 / portTICK_PERIOD_MS);
@@ -143,7 +129,7 @@ RNZu9YO6bVi9JNlWSOrvxKJGgYhqOkbRqZtNyWHa0V1Xahg=
         extractVersion(version, firmwareVersion);
         free(version);
 
-        wifiClient.setCACert(GITHUB_CA);
+        wifiClient.setCACertBundle(rootca_crt_bundle_start);
     }
 
     void start() {
