@@ -44,6 +44,9 @@ namespace Wifi {
     TaskHandle_t task_scan;
     TaskHandle_t task_dns;
     TaskHandle_t task_wifi;
+    const char* checkSSID;
+    const char* checkPassword;
+    WifiCheck* checkData;
 
     void scanTask(void * parameter) { 
         uint32_t thread_notification;
@@ -161,7 +164,6 @@ namespace Wifi {
 
         WiFi.persistent(false);
         WiFi.mode(WIFI_MODE_APSTA);
-        WiFi.setHostname(Config::name.c_str());
 
         xTaskCreate(scanTask, "Wifi-Scan", 4096, NULL, 5, &task_scan);
     }
@@ -185,51 +187,58 @@ namespace Wifi {
         } 
     }
 
-
-    WifiCheck check(const char * ssid, const char * password) {
-        WifiCheck returnValue;
-        wl_status_t status =  WiFi.begin(ssid, password);
+    void _check(void * parameter) {
+        wl_status_t status =  WiFi.begin(checkSSID, checkPassword);
+        
+        checkData->finished = true;
 
         if(status == WL_CONNECT_FAILED) {
-            returnValue.succeed = false;
-            returnValue.ip = "";
+            checkData->succeed = false;
+            checkData->ip = "";
 
             WiFi.disconnect();
-
-            return returnValue;
+            return;
         }
 
         // TODO: catch watchdog
         EventBits_t data = xEventGroupWaitBits(eventGroup, WIFI_EVENT_CONNECTED_BIT | WIFI_EVENT_DISCONNECTED_BIT, pdTRUE, pdFALSE, 10000 / portTICK_PERIOD_MS);
 
         if((data & WIFI_EVENT_CONNECTED_BIT) == 0 && (data & WIFI_EVENT_DISCONNECTED_BIT) != 0) {
-            returnValue.succeed = false;
-            returnValue.ip = "";
+            checkData->succeed = false;
+            checkData->ip = "";
 
             WiFi.disconnect();
-
-            return returnValue;
+            return;
         }
 
         data = xEventGroupWaitBits(eventGroup, WIFI_EVENT_GOT_IP_BIT, pdTRUE, pdFALSE, 5000 / portTICK_PERIOD_MS);
 
         if((data & WIFI_EVENT_GOT_IP_BIT) == 0 ) {
-            returnValue.succeed = false;
-            returnValue.ip = "";
+            checkData->succeed = false;
+            checkData->ip = "";
 
             WiFi.disconnect();
-
-            return returnValue;
+            return;
         } // TODO: better error handling
 
-        returnValue.succeed = true;
-        returnValue.ip = WiFi.localIP().toString();
+        checkData->succeed = true;
+        checkData->ip =WiFi.localIP().toString().c_str();
 
         WiFi.disconnect();
-
-        return returnValue;
     }
 
+    void check(const char * ssid, const char * password) {
+        free(checkData);
+        checkData = (WifiCheck*) malloc(sizeof(WifiCheck));
+        checkSSID = ssid;
+        checkPassword = password;
+
+        xTaskCreate(_check, "Wifi-Check", 8192, NULL, 5, NULL);
+    }
+
+    WifiCheck* getCheck() {
+        return checkData;
+    }
 
     void startAP(const char *ssid, const char *pass) {
         WiFi.softAPConfig(apIP, apIP, netMask);
@@ -247,6 +256,9 @@ namespace Wifi {
 
     void connect(const char * ssid, const char * password) {
         WiFi.begin(ssid, password);
+
+        WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+        WiFi.setHostname(Config::name.c_str());
     }
 
     void disconnect() {

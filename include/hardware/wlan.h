@@ -47,6 +47,7 @@ namespace Wifi {
     };
 
     struct WifiCheck {
+        bool finished = false;
         bool succeed;
         String ip;
     };
@@ -57,7 +58,8 @@ namespace Wifi {
     void stopScaning();
     void getWifis(JsonArray* array);
 
-    WifiCheck check(const char * ssid, const char * password);
+    void check(const char * ssid, const char * password);
+    WifiCheck* getCheck();
 
     void startAP(const char * ssid, const char * password);
     void stopAP();

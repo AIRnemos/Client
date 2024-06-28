@@ -20,7 +20,7 @@
 namespace StateSetup {
     
     AsyncWebHandler wifi_scan_hander;
-    AsyncWebHandler wifi_check_handler;
+    //AsyncWebHandler wifi_check_handler;
     AsyncWebHandler handler;
     bool init = false;
 
@@ -56,20 +56,13 @@ namespace StateSetup {
             request->send(response);
         });
 
-        wifi_check_handler = Web::server.on("/api/wifi/check", HTTP_POST, [] (AsyncWebServerRequest *request) {
+        /*wifi_check_handler = Web::server.on("/api/wifi/check", HTTP_POST, [] (AsyncWebServerRequest *request) {
             DynamicJsonDocument bodyJSON(1024);
             deserializeJson(bodyJSON, request->_tempObject);
 
-            DynamicJsonDocument result(1024);
+            request->send(201, "", "");
             
-            Wifi::WifiCheck checkData = Wifi::check(bodyJSON["ssid"].as<String>().c_str(), bodyJSON.containsKey("password") ? bodyJSON["password"].as<String>().c_str() : nullptr);
-
-            result["success"] = checkData.succeed;
-            result["ip"] = checkData.ip;
-
-            AsyncResponseStream *response = request->beginResponseStream("application/json");
-            serializeJson(result, *response);
-            request->send(response);
+            Wifi::check(bodyJSON["ssid"].as<String>().c_str(), bodyJSON.containsKey("password") ? bodyJSON["password"].as<String>().c_str() : nullptr);
         }, nullptr, [] (AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
             if (total > 0 && request->_tempObject == NULL) {
                 request->_tempObject = malloc(total);
@@ -78,6 +71,22 @@ namespace StateSetup {
                 memcpy((uint8_t*)(request->_tempObject) + index, data, len);
             }
         });
+
+        handler = Web::server.on("/api/wifi/check", HTTP_GET, [] (AsyncWebServerRequest *request) {}, nullptr, [] (AsyncWebServerRequest* request, uint8_t* data, size_t len, size_t index, size_t total) {
+            if (!Wifi::getCheck()->finished) {
+                request->send(404, "", "");
+                return;
+            }
+
+            DynamicJsonDocument result(1024);
+
+            result["success"] = Wifi::getCheck()->succeed;
+            result["ip"] = Wifi::getCheck()->ip;
+
+            AsyncResponseStream *response = request->beginResponseStream("application/json");
+            serializeJson(result, *response);
+            request->send(response);
+        });*/
 
         handler = Web::server.on("/api/setup", HTTP_POST, [] (AsyncWebServerRequest *request) {}, nullptr, [] (AsyncWebServerRequest* req, uint8_t* data, size_t len, size_t index, size_t total) {
             if(init) return;
@@ -98,7 +107,8 @@ namespace StateSetup {
             init = true;
 
             vTaskDelay(500 / portTICK_PERIOD_MS);
-            State::switchState(STATE_NORMAL);
+            //State::switchState(STATE_NORMAL); // TODO
+            ESP.restart();
         });
 
         Web::start();
@@ -108,7 +118,7 @@ namespace StateSetup {
         Web::stop();
 
         Web::server.removeHandler(&wifi_scan_hander);
-        Web::server.removeHandler(&wifi_check_handler);
+        //Web::server.removeHandler(&wifi_check_handler);
         Web::server.removeHandler(&handler);
         
         Wifi::stopScaning();
