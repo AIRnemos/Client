@@ -73,7 +73,7 @@ type WiFiAction = {
 }
 
 export function Setup() {
-    const [index, setIndex] = useState(8);
+    const [index, setIndex] = useState(0);
     const [data, dispatch] = useReducer<Reducer<Data, AllActions>>(
         (state: Data, action: AllActions) => {
             switch (action.type) {
