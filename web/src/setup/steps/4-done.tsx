@@ -27,11 +27,11 @@ function Component({ data, previos }: { data: Data, previos: () => void}) {
                         mode: data.wifi == WifiMode.NONE ? 0 : data.wifi == WifiMode.AP ? 1 : 2,
                         ssid: data.wifi == WifiMode.WIFI ? data.wifi_data.ssid : data.wifi == WifiMode.AP ? data.wifi_ap.ssid : undefined,
                         password: data.wifi == WifiMode.WIFI ? data.wifi_data.password : data.wifi == WifiMode.AP ? data.wifi_ap.password : undefined,
-                        retires: -1,
+                        retires: -20,
         
                         fallback: {
-                            mode: 0,
-                            ssid: "",
+                            mode: 1,
+                            ssid: "AIRnemos - " + data.name,
                             password: "",
                             retires: -1,
                         }
@@ -61,7 +61,9 @@ function Component({ data, previos }: { data: Data, previos: () => void}) {
             <Button onClick={previos}>Nochmal probieren!</Button>
         </>
     } else if(success) {
-
+        inner = <>
+            <CardTitle>Geschaft! 🥳</CardTitle>
+        </>
     } else {
         inner = <>
             <Loader2 className="animate-spin" size="60px" />
