@@ -107,7 +107,8 @@ namespace StateSetup {
             init = true;
 
             vTaskDelay(500 / portTICK_PERIOD_MS);
-            State::switchState(STATE_NORMAL);
+            //State::switchState(STATE_NORMAL); // TODO
+            ESP.restart();
         });
 
         Web::start();
