@@ -178,7 +178,8 @@ namespace OTAUpdate {
     bool isHigher(int16_t *versionPartsOne, int16_t *versionPartsTwo) {
         for (size_t i = 0; i < 3; i++)
         {
-            if (versionPartsOne[i] <= versionPartsTwo[i]) continue;
+            if (versionPartsOne[i] < versionPartsTwo[i]) return false;
+            if (versionPartsOne[i] == versionPartsTwo[i]) continue;
 
             return true;
         }
